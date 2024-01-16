@@ -1,0 +1,1 @@
+If manually installing Python PortIO binary, name it portio.so and put it in this directory.

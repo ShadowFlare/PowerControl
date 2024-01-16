@@ -1,0 +1,1 @@
+If manually installing ryzenadj binary, put it in this directory.
