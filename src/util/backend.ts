@@ -234,16 +234,16 @@ export class Backend {
       Backend.applyCpuBoost(cpuBoost);
     }
     if (applyTarget == APPLYTYPE.SET_ALL || applyTarget == APPLYTYPE.SET_TDP) {
-      if(!PluginManager.isPatchSuccess(Patch.TDPPatch)){
+      //if(!PluginManager.isPatchSuccess(Patch.TDPPatch)){
         const tdp = Settings.appTDP();
         const tdpEnable = Settings.appTDPEnable();
         if (tdpEnable) {
           Backend.applyTDP(tdp);
         }
         else {
-          Backend.applyTDP(Backend.data.getTDPMax());
+          //Backend.applyTDP(Backend.data.getTDPMax());
         }
-      }
+      //}
     }
     if (applyTarget == APPLYTYPE.SET_ALL || applyTarget == APPLYTYPE.SET_GPUMODE) {
       const gpuMode = Settings.appGPUMode();

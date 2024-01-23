@@ -4,7 +4,7 @@ import {
   ToggleField,
 } from "decky-frontend-lib";
 import { useEffect, useState, VFC} from "react";
-import { Settings,Backend, PluginManager,ComponentName, UpdateType, GPUMODE, Patch} from "../util";
+import { Settings,Backend, PluginManager,ComponentName, UpdateType, GPUMODE} from "../util";
 import { localizeStrEnum,localizationManager } from "../i18n";
 import {SlowSliderField} from "./SlowSliderField"
 
@@ -189,7 +189,7 @@ export const CPUComponent: VFC = () => {
           <CPUBoostComponent/>
           <CPUSmtComponent/>
           <CPUNumComponent/>
-          {!PluginManager.isPatchSuccess(Patch.TDPPatch)&& <CPUTDPComponent/>}
+          <CPUTDPComponent/>
         </PanelSection>}
         </div>
     );

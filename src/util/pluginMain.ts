@@ -197,7 +197,9 @@ export class FanControl{
 export class PluginManager{
   private static state:PluginState;
   private static listeners: Map<ComponentName,Map<ComponentName,ComponentUpdateHandler>> = new Map();
+  private static batteryChangeHook:any;
   private static suspendEndHook:any;
+  private static last_ac_state:number = 0;
   public static register = async(serverAPI:ServerAPI)=>{
     PluginManager.state = PluginState.INIT; 
     await Backend.init(serverAPI);
@@ -217,7 +219,17 @@ export class PluginManager{
       if (Settings.ensureEnable()) {
         Backend.throwSuspendEvt()
       }
+      setTimeout(()=>{
       Backend.applySettings(APPLYTYPE.SET_ALL);
+      },1000)
+    });
+    PluginManager.batteryChangeHook = SteamClient.System.RegisterForBatteryStateChanges((steamBattery:SteamBattery) => {
+      if(this.last_ac_state!=steamBattery.eACState){
+          this.last_ac_state = steamBattery.eACState;
+          setTimeout(()=>{
+      Backend.applySettings(APPLYTYPE.SET_TDP);
+          },500)
+      }
     });
     PluginManager.state = PluginState.RUN;
   }
@@ -232,6 +244,7 @@ export class PluginManager{
   }
 
   public static unregister(){
+    PluginManager.batteryChangeHook?.unregister();
     PluginManager.suspendEndHook?.unregister();
     PluginManager.updateAllComponent(UpdateType.DISMOUNT);
     QAMPatch?.unpatch();

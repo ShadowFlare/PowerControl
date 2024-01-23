@@ -6,7 +6,7 @@ import { Backend } from "./backend";
 import { GPUMODE, GPUPerformanceLevel, Patch } from "./enum";
 import { Settings } from "./settings";
   
-interface SteamBattery {
+export interface SteamBattery {
     bHasBattery: boolean;
     bShutdownRequested: boolean;
     eACState: number;
@@ -80,6 +80,9 @@ class TDPPatch{
         this.perfStore = perfStoreClass.Get();
     }
     private applyTDP = ()=>{
+        if(Settings.appTDPEnable()){
+            return;
+        }
         if(this.perfStore?.msgSettingsPerApp?.is_tdp_limit_enabled){
             Backend.applyTDP(this.perfStore?.msgSettingsPerApp?.tdp_limit)
         }else{
