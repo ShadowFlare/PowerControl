@@ -80,14 +80,18 @@ class TDPPatch{
         this.perfStore = perfStoreClass.Get();
     }
     private applyTDP = ()=>{
+        if(this.perfStore?.msgSettingsPerApp?.is_tdp_limit_enabled){
+            this.doApplyTDP(this.perfStore?.msgSettingsPerApp?.tdp_limit)
+        }else{
+            this.doApplyTDP(Backend.data.getTDPMax())
+        }
+    }
+    private doApplyTDP = (tdp:number)=>{
+        Backend.last_tdp = tdp;
         if(Settings.appTDPEnable()){
             return;
         }
-        if(this.perfStore?.msgSettingsPerApp?.is_tdp_limit_enabled){
-            Backend.applyTDP(this.perfStore?.msgSettingsPerApp?.tdp_limit)
-        }else{
-            Backend.applyTDP(Backend.data.getTDPMax())
-        }
+        Backend.applyTDP(tdp);
     }
 
     public patch(patchCallBack:(isPatchSuccess:boolean)=>void){
@@ -183,18 +187,22 @@ class GPUPerformancePatch{
         this.perfStore = perfStoreClass.Get();
     }
     private applyGPUFreq = ()=>{
+        if(GPUPerformanceLevel.ENABLE == this.perfStore?.msgSettingsPerApp?.gpu_performance_level){
+            console.log("Applying gpuFreq " + this.perfStore.msgSettingsPerApp.gpu_performance_manual_mhz?.toString() + "gpu_enable " + this.perfStore?.msgSettingsPerApp?.gpu_performance_level);
+            this.doApplyGPUFreq(this.perfStore.msgSettingsPerApp.gpu_performance_manual_mhz??0)
+        }else{
+            console.log("Applying gpuFreq 0" +"gpu_enable " + this.perfStore?.msgSettingsPerApp?.gpu_performance_level);
+            this.doApplyGPUFreq(0)
+        }
+        
+    }
+    private doApplyGPUFreq = (freq: number)=>{
+        Backend.last_gpu_freq = freq;
         //其他模式时防止原生设置改变频率
         if(Settings.appGPUMode()==GPUMODE.RANGE||Settings.appGPUMode()==GPUMODE.AUTO){
             return;
         }
-        if(GPUPerformanceLevel.ENABLE == this.perfStore?.msgSettingsPerApp?.gpu_performance_level){
-            console.log("Applying gpuFreq " + this.perfStore.msgSettingsPerApp.gpu_performance_manual_mhz?.toString() + "gpu_enable " + this.perfStore?.msgSettingsPerApp?.gpu_performance_level);
-            Backend.applyGPUFreq(this.perfStore.msgSettingsPerApp.gpu_performance_manual_mhz??0)
-        }else{
-            console.log("Applying gpuFreq 0" +"gpu_enable " + this.perfStore?.msgSettingsPerApp?.gpu_performance_level);
-            Backend.applyGPUFreq(0)
-        }
-        
+        Backend.applyGPUFreq(freq);
     }
     private onGpuModeChange = ()=>{
         //插件设置切换回原生时主动应用一次

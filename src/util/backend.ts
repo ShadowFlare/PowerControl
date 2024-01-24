@@ -160,10 +160,15 @@ export class BackendData{
 export class Backend {
   private static serverAPI: ServerAPI;
   public static data: BackendData;
+  public static last_tdp:number;
+  private static last_tdp_enable:boolean = false;
+  public static last_gpu_freq:number = 0;
+  private static last_gpu_mode = GPUMODE.NATIVE;
   public static async init(serverAPI: ServerAPI) {
     this.serverAPI = serverAPI;
     this.data = new BackendData();
     await this.data.init(serverAPI);
+    this.last_tdp = this.data.getTDPMax();
   }
 
   private static applySmt(smt: boolean) {
@@ -241,8 +246,11 @@ export class Backend {
           Backend.applyTDP(tdp);
         }
         else {
-          //Backend.applyTDP(Backend.data.getTDPMax());
+          if (this.last_tdp_enable != tdpEnable) {
+          Backend.applyTDP(this.last_tdp);
+          }
         }
+        this.last_tdp_enable = tdpEnable;
       //}
     }
     if (applyTarget == APPLYTYPE.SET_ALL || applyTarget == APPLYTYPE.SET_GPUMODE) {
@@ -253,6 +261,10 @@ export class Backend {
       const gpuRangeMinFreq = Settings.appGPURangeMinFreq();
       if (gpuMode == GPUMODE.NATIVE) {
         console.log(`原生设置无需处理`)
+        if (this.last_gpu_mode != gpuMode) {
+        Backend.applyGPUAuto(false);
+        Backend.applyGPUFreq(this.last_gpu_freq);
+        }
       }else if (gpuMode == GPUMODE.AUTO) {
         console.log(`开始自动优化GPU频率`)
         Settings.setTDPEnable(false);
@@ -267,6 +279,7 @@ export class Backend {
         console.log(`出现意外的GPUmode = ${gpuMode}`)
         Backend.applyGPUFreq(0);
       }
+      this.last_gpu_mode = gpuMode;
     }
     /*
     if (applyTarget == APPLYTYPE.SET_ALL || applyTarget == APPLYTYPE.SET_FANMODE){
