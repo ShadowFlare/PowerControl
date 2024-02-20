@@ -34,5 +34,3 @@ $ sudo tar -xvzf PowerControl.tar.gz -C homebrew/plugins/
 $ sudo rm -f homebrew/plugins/PowerControl/bin/ryzenadj
 $ sudo rm -f homebrew/plugins/PowerControl/backend/portio.so
 ```
-
-mengmeet's version may require portio.so to be available for the plugin the function properly, at least until there's a new release past v2.2.3.
