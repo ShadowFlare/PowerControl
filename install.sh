@@ -52,6 +52,12 @@ echo "Downloading $package $RELEASE_VERSION"
 curl -L "$RELEASE_URL" -o "$temp_file"
 
 sudo tar -xzf "$temp_file" -C $temp
+echo "Removing ryzenadj and portio.so from new package and backing up existing ones before installing new package"
+echo "Do not use this version of the script if you want to use the provided copies from mengmeet, as they will not be kept up-to-date by this modified installation script."
+rm "${temp}/${package}/bin/ryzenadj"
+mv "${plugin_dir}/${package}/bin/ryzenadj" "${temp}/${package}/bin/ryzenadj"
+rm "${temp}/${package}/backend/portio.so"
+mv "${plugin_dir}/${package}/backend/portio.so" "${temp}/${package}/backend/portio.so"
 sudo rsync -av "${temp}/${package}/" $plugin_dir --delete
 
 rm "$temp_file"
